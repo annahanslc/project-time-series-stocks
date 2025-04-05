@@ -1,5 +1,7 @@
 # Predicting the Future Stock Price of Delta Airlines ✈️
 
+![Delta Header](https://www.linkedin.com/in/pdcrowley/overlay/background-image/')
+
 The stock market is volatile and unpredictable, and single stocks are especially notoriously difficult to predict. 
 Stock prices change from day to day, and trying to predict them is no easier than predicting the future. 
 However, the price of tomorrow is undoubtedly dependent on today's price, yesterday's price, and so forth.
