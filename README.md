@@ -79,20 +79,23 @@ In addition to flattening trends, differencing also helps to alleviate seasonali
 
 1. First, I used seasonal decompose to visualize seasonality:
 
-![seasonal_decompose](https://github.com/user-attachments/assets/49c1dc33-10f5-4633-a1ac-88751e7fcd48)
+     ![seasonal_decompose](https://github.com/user-attachments/assets/49c1dc33-10f5-4633-a1ac-88751e7fcd48)
 
-My observations of the above plot were as follows:
-
-- The top plot is the transformed Data.
-- The second plot visualizes if there are any trend. Since it is flat on average, and fluctuating randomly, it suggests that there are no strong long-term trend.
-- The third plot addresses seasonality, where repeating patterns indicate the prescence of seasonality. The plot shows tight, high-frequency seasonal pattern. This could be true seasonality *but* it can also be the result of noise and market micro-patterns. I dived into this further in the next step.
-- The fourth plot plots the residuals. There are no clear patterns, and the residuals are randomly spread out around 0, so the data does not display signs of being non-stationary.
+     My observations of the above plot were as follows:
+     
+     1. The top plot is the transformed Data.
+     2. The second plot visualizes if there are any trend. Since it is flat on average, and fluctuating randomly, it suggests that there are no strong long-term trend.
+     3. The third plot addresses seasonality, where repeating patterns indicate the prescence of seasonality. The plot shows tight, high-frequency seasonal pattern. This could be true seasonality *but* it can also be the result of noise and market micro-patterns. I dived into this further in the next step.
+     4. The fourth plot plots the residuals. There are no clear patterns, and the residuals are randomly spread out around 0, so the data does not display signs of being non-stationary.
 
 2. To conduct a deeper investigation of seasonality, I calculated the period of seasonality using periodogram. Periodogram from scipy.signal can help determine how much of the data's variance is explained by each frequency, where the frequencies are an array of the most dominant frequency values. When 1 is divided by the frequency, we get the approximate cycle length of the repeating cycle. For the periodogram computation, I chose to use the data *after* log transformation, but *without differencing*. This is because differencing can weaken the seasonal signals and/or distort them. During the modeling process later, I will need to know seasonal period in order to remove seasonality.
 
-- Using the periodogram method, I found 2 dominant periods, 781 and 195.25 business days. The data contains 781 periods, so this indicates that there is still an overarching trend, which will categorize the entire dataset as 1 cycle. The trend is as expected, and will be removed through differencing. The second dominant period of 195.25 is likely to be a true seasonal cycle. To put this period into perspective, 195.25 business days translate to roughly 275 days on the standard calendar, which is 3 quarters of a year. The below plot also shows the peak in the periodogram at 195.25. After 260, the power continues to increase, this is likely due to a trend in the data.
+     1. Using the periodogram method, I found 2 dominant periods, 781 and 195.25 business days.
+     2. The data contains 781 periods, so this indicates that there is still an overarching trend, which will categorize the entire dataset as 1 cycle. The trend is as expected, and will be removed through differencing.
+     3. The second dominant period of 195.25 is likely to be a true seasonal cycle. To put this period into perspective, 195.25 business days translate to roughly 275 days on the standard calendar, which is 3 quarters of a year.
+     4. The below plot also shows the peak in the periodogram at 195.25. After 260, the power continues to increase, this is likely due to a trend in the data.
 
-![periodogram](https://github.com/user-attachments/assets/6ab96bbc-880c-4716-94cd-beab5ffde17a)
+     ![periodogram](https://github.com/user-attachments/assets/6ab96bbc-880c-4716-94cd-beab5ffde17a)
 
 
 ### Modeling
