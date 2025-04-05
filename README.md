@@ -37,9 +37,23 @@ In order to conduct time series modeling on the data, the data was cleaned using
 
 Data must be stationary before applying an ARIMA model and using ACF and PACF plots to select the appropriate hyperparameters (p, d, and q). ARIMA assumes stationarity — meaning the statistical properties of the series do not change over time. Data is considered stationary if the following conditions are met:
 
-1. Constant mean - the average value remains stable over time. A trending mean (either upward or downward) indicates non-stationarity. Stationary data should show no long-term trend.
-2. Constant variance (homoscedasticity) - variability (spread) of the data should be consistent throughout the series. If the variance changes over time (e.g., increases during certain periods), the series is heteroscedastic and not stationary.
-3. Autocovariance that does not depend on time - the relationship between values at different lags should depend only on the lag distance, not on the actual time at which the series is observed. Patterns such as seasonality — where values repeat at regular intervals — introduce time-dependent autocovariance and must be removed or modeled to achieve stationarity.
+1. **Constant mean** - the average value remains stable over time. A trending mean (either upward or downward) indicates non-stationarity. Stationary data should show no long-term trend.
+2. **Constant variance (homoscedasticity)** - variability (spread) of the data should be consistent throughout the series. If the variance changes over time (e.g., increases during certain periods), the series is heteroscedastic and not stationary.
+3. **Autocovariance** that does not depend on time - the relationship between values at different lags should depend only on the lag distance, not on the actual time at which the series is observed. Patterns such as seasonality — where values repeat at regular intervals — introduce time-dependent autocovariance and must be removed or modeled to achieve stationarity.
+
+To check the data stationary, I will plot the rolling mean and standard deviation and looked for signs of non-constant mean, non-constant variance, and cyclical patterns in the ups and downs.
+
+![rolling_mean_std](https://github.com/user-attachments/assets/31833b64-3eb1-4a2a-a56e-5bf318bbf890)
+
+Observations of the above plot:
+
+- The rolling mean shows a positive trend in the close price
+- The rolling standard deviation also signals that the standard deviation is increasing over time
+- The ups and downs show signs of cyclicality, but the patterns are nto well defined
+
+Based on the above, the data is not stationary. I will confirm this by using the ADFuller test. The null hypothesis of the ADFuller test is that the data is not stationary, I would need a p value of less 0.05 in order to reject my null hypothesis.
+
+
 
 ### Modeling
 
