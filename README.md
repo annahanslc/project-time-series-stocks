@@ -185,6 +185,16 @@ The predictions are, again, a straight line, but the test RMSE is the best so fa
 
 ### 4. Prophet with hyperparameters selected through a manual looped search
 
+Prophet is a time series forecasting model that was developed by Facebook. It is able to decompose time series into trend, seasonality, holiday effects, and noise. A Prophet model has several hyperparameters that can be tuned, the two that I will search for are the following:
+
+1. **changepoint_prior_scale** controls how stable the trend line is. A lower value is good for when the data has noise and we just want to capture the overall direction. A high value means that the model will allow sudden jumps in trend, so that it can account for real disruptions. 
+2. **seasonality_prior_scale** controls the strength of the seasonality. A lower values means that the seasonality is smooth and simple, while a high value will allow for more complex seasonal patterns.
+
+In addition, Prophet allows for a custom seasonality period to be defined using the method **.add_seasonality**. The Prophet default seasonality are daily, weekly, and yearly. Previously, I found that the seasonality in the data has a period length of 195.25, so I used this custom seasonality in my Prophet model. 
+
+The .add_seasonality method also accepts the parameter **fourier_order**, which will tell the model how many Fourier terms to use to model the seasonal pattern. The fourier_order controls how complex the seasonal component is allowed to be. It uses sine and cosine terms to model the seasonal cycle. A higher value means that seasonal patterns can be flexible and detailed, while a lower values means smoother and simpler seasonality. Low values are between 3-5, medium values range from 10-15, and high values are over 20.
+
+
 
 
 
