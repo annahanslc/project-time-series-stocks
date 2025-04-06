@@ -9,7 +9,7 @@ Using a univariate time series model to predict stock prices is returning to the
 
 In this project, I use time series models to predict the future stock price of Delta Airlines (DAL) ✈️.
 
-### Process Overview
+# Process Overview
 
 1. [Get Data](#Getting-the-Data)
 2. [Check Data for Stationarity](#Check-for-Stationarity)
@@ -20,7 +20,7 @@ In this project, I use time series models to predict the future stock price of D
      4. Prophet with hyperparameters selected through a loop search
 4. [Predicting](#Predicting)
 
-### Getting the Data
+# Getting the Data
 
 Stock prices are obtained from **yfinance's** api. Documentation can be found here: [yfinance documentation](http://yfinance-python.org/)
 The yfinance api allows for data to be downloaded using the stock's ticker symbol, and for a period of time as defined by a start date and end date.
@@ -33,7 +33,7 @@ In order to conduct time series modeling on the data, the data was cleaned using
 3. Set the frequency to be 'B' for business days
 4. Business days does not account for holidays, so forward-fill null values with the price from the previous period that has a value
 
-### Check for Stationarity
+# Check for Stationarity
 
 Data must be stationary before applying an ARIMA model and using ACF and PACF plots to select the appropriate hyperparameters (p, d, and q). ARIMA assumes stationarity — meaning the statistical properties of the series do not change over time. Data is considered stationary if the following conditions are met:
 
@@ -41,7 +41,7 @@ Data must be stationary before applying an ARIMA model and using ACF and PACF pl
 2. **Constant variance (homoscedasticity)** - variability (spread) of the data should be consistent throughout the series. If the variance changes over time (e.g., increases during certain periods), the series is heteroscedastic and not stationary.
 3. **Autocovariance** that does not depend on time - the relationship between values at different lags should depend only on the lag distance, not on the actual time at which the series is observed. Patterns such as seasonality — where values repeat at regular intervals — introduce time-dependent autocovariance and must be removed or modeled to achieve stationarity.
 
-##### Plotting the rolling mean and standard deviation
+### Plotting the rolling mean and standard deviation
 
 To check the data stationary, I plotted the rolling mean and standard deviation and looked for signs of non-constant mean, non-constant variance, and cyclical patterns in the ups and downs.
 
@@ -55,11 +55,11 @@ My observations of the above plot were as follows:
 
 Therefore, the data is not stationary. This can be confirmed using the ADFuller test. 
 
-##### Using the ADFuller test to check for stationarity.
+### Using the ADFuller test to check for stationarity.
 
 The null hypothesis of the ADFuller test is that the data is not stationary, I would need a p value of less 0.05 in order to reject my null hypothesis. The ADFuller test returned a p-value of 0.5958, which is much greater than 0.05. This means that I cannot reject the null hypothesis that the data is not stationary. 
 
-##### Transform the data to become more stationary.
+### Transform the data to become more stationary.
 
 To make the data stationary, I removed non-constant variance by taking the log the close price, and then removed the trend by taking the difference of the logged close price. After logging the data, and taking 1 level of difference, again, I plotted the data along with the rolling mean and standard deviation to check for stationarity. 
 
@@ -73,7 +73,7 @@ My observations of the above plot were as follows:
 
 To confirm that the data is now stationary, again, I checked the ADFuller test's p-value. The ADFuller test on the data transformed by taking the log, and then taken 1 level of difference returned a p-value of 2.33e-30, which is much smaller that 0.05, so I can confidently reject the null hypothesis that the data is non-stationary. 
 
-##### Check for Seasonality.
+### Check for Seasonality.
 
 In addition to flattening trends, differencing also helps to alleviate seasonality, but since the ADFuller test does not check for seasonality, I needed to double check that there is no more seasonality left in the transformed data.  
 
@@ -94,13 +94,48 @@ In addition to flattening trends, differencing also helps to alleviate seasonali
      2. The data contains 781 periods, so this indicates that there is still an overarching trend, which will categorize the entire dataset as 1 cycle. The trend is as expected, and will be removed through differencing.
      3. The second dominant period of 195.25 is likely to be a true seasonal cycle. To put this period into perspective, 195.25 business days translate to roughly 275 days on the standard calendar, which is 3 quarters of a year.
      4. The below plot also shows the peak in the periodogram at 195.25. After 260, the power continues to increase, this is likely due to a trend in the data.
+     5. I will be using 195.25 days as the length of a period in my modeling later.
 
      ![periodogram](https://github.com/user-attachments/assets/6ab96bbc-880c-4716-94cd-beab5ffde17a)
 
 
-### Modeling
+# Modeling
 
-### Predicting
+I explored the following models for my time series:
+
+1. ARIMA with hyperparameters selected using ACF and PACF plots
+2. ARIMA with hyperparameters selected through autoARIMA
+3. ARIMA with hyperparameters selected through a looped search
+4. Prophet with hyperparameters selected through a looped search
+     
+### 1. ARIMA with hyperparameters selected using ACF and PACF plots
+
+To stablize the data, I performed a log transformation, took 2 levels of difference, and removing seasonality by subtracting seasonal from seasonal_decompose. The resulting p-value from ADFuller is 6.783e-19, which means I can confidently reject the null hypothesis that the data is non-stationary.
+
+To manual determine the best hyperparameters for my ARIMA model, I generated the following ACF and PACF plots:
+
+<img src="https://github.com/user-attachments/assets/91eef2f7-9366-4192-8f84-2301413eaa6c" width="400">
+<img src="https://github.com/user-attachments/assets/575a3286-7324-42d4-848a-f30807d1262e" width="400">
+
+My observations of the above plots were as follows:
+
+- The ACF plot shows a drop in correlation after lag of 1, which suggests that the MA component in the ARIMA model is 1 (q=1)
+- The PACF plot shows that after lag of 8, the partial autocorrelation becomes insignificant. This suggests that the AR component of the model is 8 (p=8).
+
+My first ARIMA model with hyperparameters of p=8, d=2, q=1, produced the following metrics:
+
+1. Train RMSE = 7.737
+2. Test RMSE = 9.475
+
+The predictions for test are plotted alongside the actual values in the below plot:
+
+![arima821_preds](https://github.com/user-attachments/assets/7d25c0f0-58b4-4473-a8a3-721984722816)
+
+The prediction is overall linear. It captures, on average, the actual values on average, but it misses the nuances in the ups and downs. The model is not bad, but I will continue to try to find better models.
+
+
+
+# Predicting
 
 
 
