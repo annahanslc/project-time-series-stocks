@@ -194,8 +194,22 @@ In addition, Prophet allows for a custom seasonality period to be defined using 
 
 The .add_seasonality method also accepts the parameter **fourier_order**, which will tell the model how many Fourier terms to use to model the seasonal pattern. The fourier_order controls how complex the seasonal component is allowed to be. It uses sine and cosine terms to model the seasonal cycle. A higher value means that seasonal patterns can be flexible and detailed, while a lower values means smoother and simpler seasonality. Low values are between 3-5, medium values range from 10-15, and high values are over 20.
 
+In my loop, I searched for the best combination from a set list of changepoint_prior_scale, seasonality_prior_scale and fourier_order values. The best parameters were as follows:
 
+1. changepoint_prior_scale = 0.5
+2. seasonality_prior_scale = 10.0
+3. fourier_order = 4
 
+Below are the best Prophet model train and test RMSE compared to the previous models:
+
+| model                    | hyperparameters               |   train RMSE |   test RMSE |
+|:-------------------------|:------------------------------|-------------:|------------:|
+| ARIMA using acf and pacf | p=8, d=2, q=1                 |      7.73718 |     9.47508 |
+| ARIMA using autoARIMA    | p=0, d=1, q=0                 |      1.65084 |     8.25956 |
+| ARIMA search loop        | p=5, d=2, q=1                 |      7.7353  |     7.7969  |
+| Prophet search loop      | cps=0.5, sps=10.0, f=4, p=195 |      1.64734 |     7.11905 |
+
+The Prophet model returned the best test RMSE as well as train RMSE. I will use this model to make the predictions.
 
 
 # Predicting
