@@ -15,7 +15,7 @@ In this project, I use time series models to predict the future stock price of D
 2. [Check Data for Stationarity](#Check-for-Stationarity)
 3. [Modeling](#Modeling)
      1. ARIMA with hyperparameters selected using ACF and PACF plots
-     2. ARIMA with hyperparameters selected through autoARIMA
+     2. ARIMA with hyperparameters selected through AutoARIMA
      3. ARIMA with hyperparameters selected through a loop search
      4. Prophet with hyperparameters selected through a loop search
 4. [Predicting](#Predicting)
@@ -104,7 +104,7 @@ In addition to flattening trends, differencing also helps to alleviate seasonali
 I explored the following models for my time series:
 
 1. ARIMA with hyperparameters selected using ACF and PACF plots
-2. ARIMA with hyperparameters selected through autoARIMA
+2. ARIMA with hyperparameters selected through AutoARIMA
 3. ARIMA with hyperparameters selected through a looped search
 4. Prophet with hyperparameters selected through a looped search
      
@@ -122,6 +122,8 @@ My observations of the above plots were as follows:
 - The ACF plot shows a drop in correlation after lag of 1, which suggests that the MA component in the ARIMA model is 1 (q=1)
 - The PACF plot shows that after lag of 8, the partial autocorrelation becomes insignificant. This suggests that the AR component of the model is 8 (p=8).
 
+The ARIMA model can perform differencing, so the data I used for training the ARIMA model was transformed by taking the log, and deseasonalized by subtracting seasonal from seasonal_decompose, but not yet differenced. In the model, I set d=2 to implement 2 levels of differencing.
+
 My first ARIMA model with hyperparameters of p=8, d=2, q=1, produced the following metrics:
 
 1. Train RMSE = 7.737
@@ -131,7 +133,58 @@ The predictions for test are plotted alongside the actual values in the below pl
 
 ![arima821_preds](https://github.com/user-attachments/assets/7d25c0f0-58b4-4473-a8a3-721984722816)
 
-The prediction is overall linear. It captures, on average, the actual values on average, but it misses the nuances in the ups and downs. The model is not bad, but I will continue to try to find better models.
+The prediction is overall linear. It captures, on average, the actual values on average, but it misses the nuances in the ups and downs. The model is not bad, but I will continue to try to improve my model.
+
+### 2. ARIMA with hyperparameters selected through AutoARIMA
+
+The function AutoARIMA(), from the pmdarima library, will automatically find the best ARIMA or SARIMA (ARIMA with seasonality) model for a time series. It searches over a combination of p, d, q and seasonal P, D, Q to find the best model based on metrics, primarily  AIC and BIC. By default, it will select the model with the lowest AIC score. 
+
+Using AutoARIMA with the following hyperparameter ranges, with both the starting and ending numbers included:
+
+p from 0 to 10 
+d from 0 to 3
+q from 0 to 5
+
+The best model determined by the AutoARIMA is q=0, d=1, p=1. This is a very simple model, and it basically just uses the previous period's value to predict future values. The predictions for the test timeframe can be seens as a straight line in the plot below:
+
+![autoairma_preds](https://github.com/user-attachments/assets/20cd36ce-60f2-4de9-8542-5c28b4ec47fd)
+
+Predictions performance is as follows:
+
+1. Train RMSE = 1.651
+2. Test RMSE = 8.260
+
+The performance is indeed better than my previous model. However, it only considers the previous period's value in its prediction. It does not take into any autocorrelation, or moving average. This makes it a poor model for predicting any longer periods of time. 
+
+As I mentioned eariler, the AutoARIMA() function uses the AIC score in its best model selection. I am more concerned about the model's ability to predict the test period, so test RMSE is the most important metric in my evaluation. Therefore, I will continue to improve my model with this as the goal.
+
+### 3. ARIMA with hyperparameters selected through a manual looped search
+
+To find the combination of hyperparameters that will return the lowest test RMSE, I created a function to return the train and test RMSE for an ARIMA model with p, d and q as arguments. Next, I created a loop using product (from itertools) to try all combinations of p, d, and q from a set range of values in the function. The RMSE scores are then appended to a dataframe that collects all the scores. 
+
+After the loop has run. The dataframe is sorted by ascending test RMSE score, so that the lowest is on top. The top 10 models are:
+
+|   p |   d |   q |   train_rmse |   test_rmse |
+|----:|----:|----:|-------------:|------------:|
+|   5 |   2 |   1 |      7.7353  |     7.7969  |
+|   0 |   2 |   0 |      7.78225 |     7.9499  |
+|   3 |   1 |   4 |      1.6502  |     8.2429  |
+|   3 |   1 |   3 |      1.64986 |     8.24903 |
+|   4 |   1 |   4 |      1.64992 |     8.25278 |
+|   0 |   1 |   0 |      1.65084 |     8.25956 |
+|   0 |   1 |   1 |      1.65083 |     8.25959 |
+|   1 |   1 |   0 |      1.65084 |     8.25963 |
+|   4 |   1 |   0 |      1.65058 |     8.26214 |
+|   4 |   1 |   1 |      1.65058 |     8.26218 |
+
+Using the hyperparameters that produced the best model, predictions were made for the test timeframe and plotted against actual values below:
+
+![arima_loop](https://github.com/user-attachments/assets/46a864dd-ad7a-44bd-a080-cb72b2a9b247)
+
+The predictions are, again, a straight line, but the test RMSE is the best so far. Again, the model will not fair well when predicting longer periods of time, so I will continue to look for a better model.
+
+### 4. Prophet with hyperparameters selected through a manual looped search
+
 
 
 
