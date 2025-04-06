@@ -214,5 +214,45 @@ The Prophet model returned the best test RMSE as well as train RMSE. I will use 
 
 # Predicting
 
+The Prophet model's forecast is plotted again actual values below: 
+
+![prophet_forecast_al](https://github.com/user-attachments/assets/d43efbf4-5711-49de-a6e3-51ed7fe716f2)
+
+The dots are the actual values, the blue line are the predictions, the blue shaded area outlines the confidence interval, and the red line highlights the test actual values. 
+
+Here is a close up of the last 30 predictions:
+
+![prophet_forecast_test](https://github.com/user-attachments/assets/556b4818-37cb-4f12-ab2a-4fa009ff690f)
+
+Again, the red lines are the actual test values, and the blue line are the model predictions. 
+
+The last 9 predictions are predictions *for the future* (4/1/2025 to 4/11/2025). These predictions are:
+
+
+| DATE                |     DAL |
+|:--------------------|--------:|
+| 2025-04-01 00:00:00 | 46.6953 |
+| 2025-04-02 00:00:00 | 46.8487 |
+| 2025-04-03 00:00:00 | 46.9122 |
+| 2025-04-04 00:00:00 | 46.919  |
+| 2025-04-07 00:00:00 | 46.9942 |
+| 2025-04-08 00:00:00 | 46.9844 |
+| 2025-04-09 00:00:00 | 47.1143 |
+| 2025-04-10 00:00:00 | 47.1363 |
+| 2025-04-11 00:00:00 | 47.0847 |
+
+
+# Next Steps
+
+The current model is based solely on historical stock prices, making it a univariate time series model. While this approach can capture patterns like trends and seasonality, it overlooks the fact that stock prices are influenced by a wide range of external factors.
+
+To improve forecast accuracy and better reflect real-world dynamics, my next step is to transition to a multivariate time series model by incorporating exogenous variables, such as:
+
+1. Interest rates
+2. Trading volume
+3. Market indices, such as S&P500
+4. News analysis
+5. Earnings reports
+
 
 
