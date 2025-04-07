@@ -254,5 +254,7 @@ To improve forecast accuracy and better reflect real-world dynamics, my next ste
 4. News analysis
 5. Earnings reports
 
+However, many of these variables are either not known in advance or are difficult to forecast reliably. As a result, incorporating them for future prediction may require separate modeling efforts or scenario-based forecasting. This step will focus on understanding how these variables affect stock prices historically, which could inform both predictive modeling and broader investment strategies.
+
 
 
